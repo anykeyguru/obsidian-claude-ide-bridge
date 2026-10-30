@@ -171,6 +171,9 @@ module.exports = class ClaudeIdeBridge extends Plugin {
       this.captureDomSelection();
       schedule();
     });
+    this.registerDomEvent(window, 'message', (e) => {
+      if (this.captureFrameSelection(e)) schedule();
+    });
     this.registerDomEvent(document, 'mouseup', schedule);
     this.registerDomEvent(document, 'keyup', schedule);
 
@@ -354,6 +357,26 @@ module.exports = class ClaudeIdeBridge extends Plugin {
     const a = pageOf(sel.anchorNode);
     const b = pageOf(sel.focusNode);
     this.domSel = { path: domView.file.path, text, pageStart: Math.min(a, b), pageEnd: Math.max(a, b) };
+  }
+
+  // Omni Viewer renders HTML in an opaque-origin iframe whose selection we
+  // cannot read; the page reports it as { omniViewerSelection } instead.
+  captureFrameSelection(e) {
+    const data = e.data;
+    if (!data || typeof data.omniViewerSelection !== 'string' || !e.source) return false;
+    let frameView = null;
+    this.app.workspace.iterateAllLeaves((leaf) => {
+      const v = leaf.view;
+      if (!frameView && isDomView(v) && ownsFrame(v.containerEl, e.source)) frameView = v;
+    });
+    if (!frameView) return false;
+    const text = data.omniViewerSelection;
+    if (!text.trim()) {
+      if (this.domSel && this.domSel.path === frameView.file.path) this.domSel = null;
+    } else {
+      this.domSel = { path: frameView.file.path, text, pageStart: 1, pageEnd: 1 };
+    }
+    return true;
   }
 
   snapshot() {
@@ -570,6 +593,13 @@ const isDomView = (v) => {
   return type === 'pdf' || type.startsWith('omni-viewer.');
 };
 const isFileView = (v) => !!(v && v.file && (v instanceof MarkdownView || isDomView(v)));
+
+// Whether one of the iframes in the view (or its shadow roots) is `win`.
+function ownsFrame(rootEl, win) {
+  const scopes = [rootEl];
+  for (const host of rootEl.querySelectorAll('*')) if (host.shadowRoot) scopes.push(host.shadowRoot);
+  return scopes.some((scope) => [...scope.querySelectorAll('iframe')].some((f) => f.contentWindow === win));
+}
 
 // Chromium reports a selection inside a shadow root as collapsed on the host,
 // so ask the shadow roots mounted in the view (Omni Viewer renders there).

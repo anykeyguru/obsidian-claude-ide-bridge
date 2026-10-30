@@ -6,6 +6,7 @@ Supported views:
 
 - Markdown notes (editor selection, `Send to Claude` command and context menu).
 - Built-in PDF viewer and every Omni Viewer tab: the DOM text selection is remembered, including selections inside shadow roots; for PDFs the page range is reported.
+- HTML in Omni Viewer: the page runs in a sandboxed iframe, so the viewer must post `{ omniViewerSelection: <text> }` to the parent window on `selectionchange` (done in the omni-viewer fork, `fork/trusted-html`).
 
 No dependencies, no build step: `main.js` is plain CommonJS.
 
