@@ -8,7 +8,7 @@ You need Obsidian desktop and the Claude Code CLI. Pick one way.
 
 **With BRAT, inside Obsidian.** Updates arrive by themselves.
 
-1. Settings → Community plugins → Browse: install and enable **BRAT**.
+1. Settings → Community plugins → Browse. Search for `BRAT`, then press **Install** and **Enable**.
 2. Open **BRAT: Add a beta plugin**, enter `anykeyguru/obsidian-claude-ide-bridge`.
 3. Enable **Claude IDE Bridge** in Community plugins.
 
