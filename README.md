@@ -46,9 +46,9 @@ No model is involved: the same input always gives the same page. Rebuilding keep
 To add what the data cannot say, write `<name>.fields.yaml` next to the file:
 
 ```yaml
-title: Scoring response
+title: Order response
 fields:
-  result.score: { class: model, title: Model score, status: partly, owner: Data science }
+  result.total: { class: model, title: Predicted total, status: partly, owner: Data science }
   orders:id: { class: static, title: Order number }
 ```
 

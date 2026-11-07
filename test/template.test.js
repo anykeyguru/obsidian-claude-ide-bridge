@@ -221,7 +221,7 @@ test('JSON keys take the colour of their class; an unknown field is grey', async
   const p = await page();
   const color = (name) => p.$$('.key').find((b) => b.textContent === `"${name}"`).style.getPropertyValue('--field');
   assert.equal(color('version'), 'var(--k3)');
-  assert.equal(color('score'), 'var(--k1)');
+  assert.equal(color('total'), 'var(--k1)');
   assert.equal(color('segment'), '');
   assert.deepEqual(p.$$('.legend .pill').map((x) => x.textContent), ['Model', 'Dictionary', 'Static']);
   assert.deepEqual(p.$$('.legend .grp > b').map((x) => x.textContent), ['Dynamic, every run', 'Static, our dictionaries', 'Technical layer', 'Available now']);
@@ -232,12 +232,12 @@ test('the first field is selected, a click opens another card', async () => {
   const p = await page();
   assert.equal(p.$('.detail h3').textContent, 'version');
   assert.equal(p.$('.detail .badge').textContent, 'new');
-  p.$$('.key').find((b) => b.textContent === '"score"').click();
-  assert.equal(p.$('.detail h3').textContent, 'result.score');
+  p.$$('.key').find((b) => b.textContent === '"total"').click();
+  assert.equal(p.$('.detail h3').textContent, 'result.total');
   assert.match(p.$('.detail dl').textContent, /Typenumber.*Example0\.87/);
   assert.equal(p.$$('.detail dd input').length, 1, 'only the missing attribute is an input');
   assert.equal(p.$$('.ln.sel').length, 1);
-  assert.match(p.$('.ln.sel').textContent, /"score": 0\.87/);
+  assert.match(p.$('.ln.sel').textContent, /"total": 0\.87/);
 });
 
 test('clicking between keys does not open a card', async () => {
@@ -291,15 +291,15 @@ test('emptying a card value removes it from the file', async () => {
 
 test('a changed type marks a field as changed; a new example does not', async () => {
   const p = await page();
-  p.$$('.key').find((b) => b.textContent === '"score"').click();
+  p.$$('.key').find((b) => b.textContent === '"total"').click();
   buttonIn(p.$('.detail'), 'Approve').click();
   await tick();
   const stored = p.host.file;
-  const example = await page({ html: TEMPLATE.replace('"score": 0.87', '"score": 0.5'), stored });
-  example.$$('.key').find((b) => b.textContent === '"score"').click();
+  const example = await page({ html: TEMPLATE.replace('"total": 0.87', '"total": 0.5'), stored });
+  example.$$('.key').find((b) => b.textContent === '"total"').click();
   assert.equal(example.$('.detail .badge').textContent, 'approved');
-  const type = await page({ html: TEMPLATE.replace('"score": 0.87', '"score": "high"'), stored });
-  type.$$('.key').find((b) => b.textContent === '"score"').click();
+  const type = await page({ html: TEMPLATE.replace('"total": 0.87', '"total": "high"'), stored });
+  type.$$('.key').find((b) => b.textContent === '"total"').click();
   assert.equal(type.$('.detail .badge').textContent, 'changed');
 });
 
@@ -355,10 +355,10 @@ test('a class may carry its own colour, and an unknown class keeps its id', asyn
 
 test('the passport shows number, title, class, status, attributes and note', async () => {
   const p = await page();
-  p.$$('.key').find((b) => b.textContent === '"score"').click();
+  p.$$('.key').find((b) => b.textContent === '"total"').click();
   const card = p.$('.detail');
   assert.equal(card.querySelector('.eyebrow').textContent, 'Field passport · registry № 3');
-  assert.equal(card.querySelector('.biz').textContent, 'Model score');
+  assert.equal(card.querySelector('.biz').textContent, 'Predicted total');
   assert.equal(card.querySelector('.pill').textContent, 'Model');
   assert.equal(card.querySelector('.tone-part').textContent, 'Partly');
   assert.equal(card.querySelector('.note').textContent, 'Rounded to two digits.');
@@ -379,8 +379,8 @@ test('an unknown status keeps its id', async () => {
 test('the status dot follows the field, also when filled in', async () => {
   const p = await page();
   const dot = (name) => p.$$('.key').find((b) => b.textContent === `"${name}"`).parentElement.querySelector('.miss');
-  assert.equal(dot('score').className, 'miss tone-part');
-  assert.equal(dot('score').textContent, '●');
+  assert.equal(dot('total').className, 'miss tone-part');
+  assert.equal(dot('total').textContent, '●');
   assert.equal(dot('segment').textContent, '');
   p.$$('.key').find((b) => b.textContent === '"segment"').click();
   const select = p.$$('.detail select')[1];
@@ -427,7 +427,7 @@ test('Copy JSON puts the document on the clipboard and says so', async () => {
   button.click();
   await tick();
   assert.equal(button.textContent, 'Copied');
-  assert.deepEqual(JSON.parse(copied[0]), { version: '1.0', result: { score: 0.87, segment: 'A' } });
+  assert.deepEqual(JSON.parse(copied[0]), { version: '1.0', result: { total: 0.87, segment: 'A' } });
   Object.defineProperty(p.window.navigator, 'clipboard', { value: { writeText: async () => { throw new Error('denied'); } }, configurable: true });
   button.click();
   await tick();

@@ -25,9 +25,9 @@ It writes `<name>.review.html` next to the file. The same input always gives the
 To add what the data cannot say (classes, titles, statuses, owners), write `<name>.fields.yaml` next to the file and rebuild:
 
 ```yaml
-title: Scoring response
+title: Order response
 fields:
-  result.score: { class: model, title: Model score, status: partly, owner: Data science }
+  result.total: { class: model, title: Predicted total, status: partly, owner: Data science }
   orders:id: { class: static, title: Order number }
 ```
 
@@ -59,7 +59,7 @@ For an API contract or any other JSON, put `<div data-json="key">` in a tab and 
 - `groups` frame the legend, for example what changes on every run, what is static, and the technical layer.
 - `statuses` are the dots, each with a `tone` of `ok`, `part` or `no`. `statusLabel` names them, for example "Available now".
 - `attributes` are the rows of the passport, for example table, storage, owner.
-- `fields`, keyed by path (`result.score`, `items[].id`) or `document:path`, holds what is known: `title`, `class`, `status`, `note`, `number`, `type` and attribute values.
+- `fields`, keyed by path (`result.total`, `items[].id`) or `document:path`, holds what is known: `title`, `class`, `status`, `note`, `number`, `type` and attribute values.
 
 A bare JSON is enough: the page builds a passport for every field from the JSON itself, with its number, path, type and example. Whatever `fields` does not say becomes an empty input or list in the passport, and what people enter is saved in `<name>.comments.json`. So fill in `fields` only with what the conversation or the user's sources establish. Leave the rest empty instead of guessing a class or a title.
 
