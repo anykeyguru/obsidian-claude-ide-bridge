@@ -1,9 +1,9 @@
 {
   "id": "claude-ide-bridge",
   "name": "Claude IDE Bridge",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "minAppVersion": "1.4.0",
-  "description": "Exposes the active note and selection to the Claude Code CLI via its IDE integration protocol (/ide).",
+  "description": "Connects the Claude Code CLI to your vault via /ide, with HTML and JSON viewers and a text editor for config files.",
   "author": "emuslimov",
   "isDesktopOnly": true
 }

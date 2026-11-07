@@ -3,6 +3,9 @@
 set -eu
 vault="${1:?usage: $0 /path/to/vault}"
 dir="$vault/.obsidian/plugins/claude-ide-bridge"
+cd "$(dirname "$0")"
+[ -d node_modules ] || npm ci
+npm run --silent build
 mkdir -p "$dir"
-cp "$(dirname "$0")/main.js" "$(dirname "$0")/manifest.json" "$dir/"
+cp main.js manifest.json styles.css "$dir/"
 echo "Deployed to $dir"

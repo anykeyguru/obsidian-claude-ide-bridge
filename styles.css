@@ -1,0 +1,29 @@
+.view-content.cib-view { display: flex; flex-direction: column; height: 100%; padding: 0; overflow: hidden; }
+.cib-toolbar.is-hidden { display: none; }
+.cib-toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--background-modifier-border); }
+.cib-toolbar button.is-active { background: var(--interactive-accent); color: var(--text-on-accent); }
+.cib-panes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.cib-panes[data-mode="source"], .cib-panes[data-mode="preview"] { grid-template-columns: minmax(0, 1fr); }
+.cib-panes[data-mode="source"] .cib-preview, .cib-panes[data-mode="preview"] .cib-editor { display: none; }
+.cib-preview { min-width: 0; height: 100%; }
+.cib-editor { width: 100%; height: 100%; resize: none; border: 0; border-radius: 0; padding: 8px; font-family: var(--font-monospace); font-size: var(--font-ui-small); white-space: pre; overflow: auto; }
+.cib-panes[data-mode="both"] .cib-editor { border-right: 1px solid var(--background-modifier-border); }
+.cib-frame { width: 100%; height: 100%; border: 0; background: #fff; }
+.cib-tree { height: 100%; overflow: auto; padding: 8px; font-family: var(--font-monospace); font-size: var(--font-ui-small); user-select: text; }
+.cib-tree-branch .cib-tree-branch, .cib-tree-branch .cib-tree-leaf { margin-left: 16px; }
+.cib-tree-branch > summary { cursor: pointer; }
+.cib-tree-key { color: var(--text-accent); }
+.cib-tree-size { color: var(--text-muted); }
+.cib-tree-string { color: var(--text-success); }
+.cib-tree-number, .cib-tree-boolean, .cib-tree-null { color: var(--text-warning); }
+.cib-error { color: var(--text-error); }
+.cib-more.is-hidden { display: none; }
+.cib-frame:not([srcdoc]) { display: none; }
+.cib-notice:empty, .cib-error:empty { display: none; }
+.cib-notice { padding: 6px 8px; background: var(--background-secondary); color: var(--text-muted); }
+.cib-table { height: 100%; overflow: auto; font-size: var(--font-ui-small); user-select: text; }
+.cib-table-status { position: sticky; left: 0; padding: 6px 8px; color: var(--text-muted); }
+.cib-table table { border-collapse: collapse; }
+.cib-table th { position: sticky; top: 0; background: var(--background-secondary); text-align: left; }
+.cib-table th, .cib-table td { padding: 3px 8px; border: 1px solid var(--background-modifier-border); white-space: pre; }
+.cib-more { display: block; margin: 8px; }

@@ -1,0 +1,17 @@
+{
+  "name": "obsidian-claude-ide-bridge",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "coverage": "node --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/**/*.test.js\"",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "jsdom": "31.0.0"
+  },
+  "dependencies": {
+    "smol-toml": "1.9.1",
+    "yaml": "2.9.1"
+  }
+}

@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+  :root {
+    --bg: #f3f5f7; --paper: #fff; --ink: #17202b; --ink2: #4b5664; --ink3: #7c8794;
+    --line: #dde2e8; --soft: #eef1f4; --accent: #1c4f7c; --accent-soft: #e3edf6;
+    --k1: #6a3fb5; --k1-bg: #ece5f8; --k2: #0f7c74; --k2-bg: #dff3f0; --k3: #a35a00; --k3-bg: #fbebd5;
+    --k4: #3d6b2e; --k4-bg: #e4f0de; --k5: #56606d; --k5-bg: #e8ebef; --k6: #1c4f7c; --k6-bg: #e3edf6;
+    --ok: #1e7a45; --part: #a87400; --no: #b3392c; --str: #2d5f2e; --num: #9a3e00; --nul: #8a94a3;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  :root[data-theme=dark] {
+    --bg: #0f141a; --paper: #161d25; --ink: #e4e9ef; --ink2: #aeb8c4; --ink3: #808c9a;
+    --line: #2a3441; --soft: #1c242e; --accent: #8db8e4; --accent-soft: #1d2b3b;
+    --k1: #b79bf0; --k1-bg: #2a2142; --k2: #4fc9bd; --k2-bg: #12312e; --k3: #f0a64a; --k3-bg: #3a2a12;
+    --k4: #8fcb78; --k4-bg: #1f3119; --k5: #a9b3c0; --k5-bg: #252d37; --k6: #8db8e4; --k6-bg: #1d2b3b;
+    --ok: #5cc48a; --part: #e3b54a; --no: #f0857a; --str: #9ed39a; --num: #f4a66a; --nul: #6f7b8a;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--body); font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 20px 40px; }
+  .cbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 16px; padding-block: 10px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .ttl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-right: auto; color: var(--ink3); font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .db { color: var(--ink2); font: 12px var(--mono); letter-spacing: 0; text-transform: none; }
+  .cstat { color: var(--ink3); font-size: 12.5px; }
+  .clabel { color: var(--ink3); font-size: 12.5px; }
+  input, select, textarea { padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: 13px var(--body); }
+  .cbtn { padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: 500 13px var(--body); cursor: pointer; }
+  .cbtn.pri { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .cbtn.sm { padding: 3px 9px; font-size: 12px; }
+  h1 { margin: 0 0 8px; font-size: 26px; line-height: 1.2; }
+  [role=tablist] { display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0 16px; border-bottom: 1px solid var(--line); }
+  [role=tab] { padding: 8px 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--ink2); font: inherit; cursor: pointer; }
+  [role=tab][aria-selected=true] { border-color: var(--accent); color: var(--ink); font-weight: 600; }
+  section[hidden] { display: none; }
+  article, .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+  article { margin: 0 0 14px; padding: 14px 16px; }
+  article h2 { margin: 0 0 6px; font-size: 16px; }
+  article p { margin: 0; }
+  .eyebrow { color: var(--ink3); font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 8px; font-size: 12.5px; }
+  .grp { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; }
+  .grp > b { margin-right: 4px; color: var(--ink3); font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 99px; background: var(--field-bg, var(--soft)); color: var(--field, var(--ink2)); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .pill .n { font: 500 11px var(--mono); opacity: .8; }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; align-items: start; }
+  @media (max-width: 900px) { .two { grid-template-columns: minmax(0, 1fr); } }
+  .sumbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .sumbar .meta { align-self: center; color: var(--ink3); font-size: 12px; }
+  .phead { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .json { max-height: 78vh; padding: 12px 0; overflow: auto; font: 12.5px/1.6 var(--mono); }
+  .ln { padding: 0 14px; white-space: pre; }
+  .ln:hover { background: var(--soft); }
+  .ln.sel { background: var(--accent-soft); }
+  .key { padding: 0 2px; border: 0; border-radius: 3px; background: var(--field-bg, var(--soft)); color: var(--field, var(--ink2)); font: inherit; cursor: pointer; }
+  .key::after { content: attr(data-mark); color: var(--ok); }
+  .s { color: var(--str); }
+  .num { color: var(--num); }
+  .nul { color: var(--nul); font-style: italic; }
+  .p { color: var(--ink3); }
+  .miss { margin-left: 6px; font: 500 9.5px var(--mono); }
+  .tone-ok { color: var(--ok); }
+  .tone-part { color: var(--part); }
+  .tone-no { color: var(--no); }
+  .detail { position: sticky; top: 64px; max-height: calc(100vh - 76px); padding: 14px 16px; overflow-y: auto; }
+  .detail h3 { margin: 6px 0 4px; font: 500 14px var(--mono); word-break: break-all; }
+  .biz { margin: 0 0 12px; color: var(--ink2); }
+  .kv { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 6px 10px; margin: 0; font-size: 13px; }
+  .kv dt { color: var(--ink3); }
+  .kv dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+  .kv input, .kv select, .biz input, .note input { width: 100%; }
+  .note { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--ink2); font-size: 13px; }
+  .cbox { display: grid; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .cbox h4 { display: flex; gap: 8px; align-items: center; margin: 0; color: var(--ink3); font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .badge { padding: 1px 8px; border-radius: 10px; background: var(--soft); color: var(--ink3); letter-spacing: 0; text-transform: none; }
+  .badge.approved { color: var(--ok); }
+  .badge.changed { color: var(--part); }
+  .citem { padding: 8px 10px; border-radius: 6px; background: var(--soft); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .citem small { display: block; color: var(--ink3); font-size: 11.5px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 6px; }
+  .controls input { flex: 1 1 160px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="cbar">
+  <span class="ttl"><span id="discussion"></span> <span class="db" id="db"></span> <span class="cstat" id="stat"></span></span>
+  <span class="cstat" id="status"></span>
+  <label class="clabel"><span id="author-label"></span> <input id="author" autocomplete="name"></label>
+  <button type="button" class="cbtn" id="load"></button>
+  <input type="file" id="load-file" accept=".json,application/json" hidden>
+  <button type="button" class="cbtn pri" id="save"></button>
+  <button type="button" class="cbtn" id="theme"></button>
+</div>
+<h1>__TITLE__</h1>
+<nav role="tablist" id="tabs"></nav>
+<main>
+  <section data-tab="Overview">
+    <article data-item="overview.goal">
+      <h2>Goal</h2>
+      <p>Replace this item with the first thing to review.</p>
+    </article>
+  </section>
+  <section data-tab="Decisions">
+    <article data-item="decisions.first">
+      <h2>First decision</h2>
+      <p>Each article is reviewed and approved on its own.</p>
+    </article>
+  </section>
+  <section data-tab="Contract">
+    <div data-json="response"></div>
+  </section>
+</main>
+</div>
+<!-- Data for [data-json] blocks. Write `<` as \u003c so text cannot close this tag. -->
+<script type="application/json" id="contract">
+{
+  "groups": [
+    { "id": "dynamic", "label": "Dynamic, every run" },
+    { "id": "static", "label": "Static, our dictionaries" },
+    { "id": "technical", "label": "Technical layer" }
+  ],
+  "classes": [
+    { "id": "model", "label": "Model", "hint": "Computed by the data science models", "group": "dynamic" },
+    { "id": "dictionary", "label": "Dictionary", "hint": "Taken from a reference table", "group": "static" },
+    { "id": "static", "label": "Static", "hint": "Fixed by the contract", "group": "technical" }
+  ],
+  "statusLabel": "Available now",
+  "statuses": [
+    { "id": "yes", "label": "Yes", "tone": "ok" },
+    { "id": "partly", "label": "Partly", "tone": "part" },
+    { "id": "no", "label": "No", "tone": "no" }
+  ],
+  "attributes": [
+    { "key": "source", "label": "Source" },
+    { "key": "owner", "label": "Owner" }
+  ],
+  "documents": {
+    "response": { "version": "1.0", "result": { "score": 0.87, "segment": "A" } }
+  },
+  "fields": {
+    "version": { "class": "static", "title": "Contract version", "status": "yes" },
+    "result.score": { "class": "model", "title": "Model score", "owner": "Data science", "status": "partly", "note": "Rounded to two digits." }
+  }
+}
+</script>
+<script>
+(() => {
+  const DOC = '__DOC_NAME__.html';
+  const DB = DOC.replace(/\.html$/, '') + '.comments.json';
+  const FORMAT = 'html-review-comments';
+  const VERSION = 1;
+  const CHANNEL = 'comments';
+  const $ = (id) => document.getElementById(id);
+  const ARRAY_PREVIEW = 20;
+
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  // Every word the page shows. Translate these to the document's language.
+  const LABELS = /* LABELS */ {
+    discussion: 'Discussion',
+    approvedCount: 'approved',
+    commentCount: 'comments',
+    review: 'Review',
+    passport: 'Field passport',
+    registry: 'registry №',
+    fields: 'Fields:',
+    copy: 'Copy JSON',
+    copied: 'Copied',
+    copyFailed: 'Copying is unavailable',
+    fieldTitle: 'What this field is',
+    fieldNote: 'Note',
+    author: 'Author',
+    load: 'Load file…',
+    save: 'Save',
+    night: 'Night mode',
+    day: 'Day mode',
+    comment: 'Comment',
+    more: 'more',
+    type: 'Type',
+    example: 'Example',
+    fieldClass: 'Class',
+    unclassified: 'Not classified',
+    approve: 'Approve',
+    acceptChange: 'Accept change',
+    anonymous: 'anonymous',
+    states: { new: 'new', open: 'open', changed: 'changed', approved: 'approved' },
+    saved: 'Saved to',
+    notSaved: 'Not saved:',
+    notLoaded: 'Not loaded:',
+    noAnswer: 'no answer',
+    noFile: 'No file yet:',
+    loadedFrom: 'Loaded from',
+    readOnly: 'read only',
+    pressSave: 'Comments stay on this page until you press Save',
+    downloaded: 'Downloaded',
+  } /* /LABELS */;
+
+  let data = { format: FORMAT, version: VERSION, document: DOC, updated_at: null, items: {} };
+  let bridged = false;
+
+  function hash(text) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < text.length; i += 1) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
+    return (h >>> 0).toString(16);
+  }
+
+  // Hashed before the review controls are added, so they never count as content.
+  const items = [...document.querySelectorAll('[data-item]')].map((article) => {
+    const item = {
+      id: article.dataset.item, hash: hash(article.textContent.replace(/\s+/g, ' ').trim()), review: el('div', 'cbox'),
+    };
+    article.append(item.review);
+    return item;
+  });
+
+  const contractEl = $('contract');
+  const contract = {
+    groups: [],
+    classes: [],
+    statuses: [],
+    statusLabel: 'Status',
+    attributes: [],
+    documents: {},
+    fields: {},
+    ...(contractEl ? JSON.parse(contractEl.textContent) : {}),
+  };
+  const classes = new Map(contract.classes.map((c, i) => [c.id, {
+    ...c, color: c.color || `var(--k${(i % 6) + 1})`, background: c.background || `var(--k${(i % 6) + 1}-bg)`,
+  }]));
+  const statuses = new Map(contract.statuses.map((s) => [s.id, s]));
+
+  function paint(node, known) {
+    node.style.setProperty('--field', known ? known.color : '');
+    node.style.setProperty('--field-bg', known ? known.background : '');
+  }
+
+  function pill(c, count) {
+    const node = el('span', 'pill', c ? c.label : LABELS.unclassified);
+    paint(node, c);
+    if (c && c.hint) node.title = c.hint;
+    if (count !== undefined) node.append(el('span', 'n', String(count)));
+    return node;
+  }
+
+  function typeOf(value) {
+    if (value === null) return 'null';
+    return Array.isArray(value) ? 'array' : typeof value;
+  }
+
+  const childPath = (path, key) => (path ? `${path}.${key}` : key);
+
+  // One entry per key path; array elements share a path, the first one is the
+  // example. Only the elements on screen count, so a long array stays cheap.
+  function collectFields(value, path, found) {
+    if (Array.isArray(value)) {
+      for (const element of value.slice(0, ARRAY_PREVIEW)) collectFields(element, `${path}[]`, found);
+    } else if (value && typeof value === 'object') {
+      for (const [key, child] of Object.entries(value)) {
+        const nested = childPath(path, key);
+        if (!found.has(nested)) found.set(nested, child);
+        collectFields(child, nested, found);
+      }
+    }
+    return found;
+  }
+
+  // A field missing from the contract still gets an item and a passport to fill in.
+  function fieldItems(host, key) {
+    const fields = new Map();
+    for (const [path, example] of collectFields(contract.documents[key], '', new Map())) {
+      // A table's columns are keyed by `table:column`, as tables share column names.
+      const def = contract.fields[`${key}:${path}`] || contract.fields[path] || {};
+      const item = {
+        id: `${key}:${path}`, path, example, def, type: def.type || typeOf(example), host, review: el('div', 'cbox'), number: def.number || fields.size + 1,
+      };
+      item.hash = hash(JSON.stringify([item.type, def]));
+      fields.set(path, item);
+      items.push(item);
+    }
+    return fields;
+  }
+
+  const cardValue = (item, key) => {
+    const record = data.items[item.id];
+    return item.def[key] || (record && record.card && record.card[key]) || '';
+  };
+
+  function drawSummary(host) {
+    const counts = new Map();
+    for (const item of host.fields.values()) {
+      const id = classes.has(cardValue(item, 'class')) ? cardValue(item, 'class') : '';
+      counts.set(id, (counts.get(id) || 0) + 1);
+    }
+    host.summary.replaceChildren(el('span', 'meta', LABELS.fields));
+    for (const [id, c] of classes) if (counts.has(id)) host.summary.append(pill(c, counts.get(id)));
+    if (counts.has('')) host.summary.append(pill(null, counts.get('')));
+  }
+
+  function markField(item) {
+    const record = data.items[item.id];
+    const count = record ? record.comments.length : 0;
+    const known = classes.get(cardValue(item, 'class'));
+    const status = statuses.get(cardValue(item, 'status'));
+    paint(item.button, known);
+    item.button.title = known ? known.label : LABELS.unclassified;
+    item.button.dataset.mark = `${stateOf(item) === 'approved' ? ' ✓' : ''}${count ? ` (${count})` : ''}`;
+    item.dot.textContent = status ? '●' : '';
+    item.dot.className = `miss tone-${status ? status.tone : ''}`;
+  }
+
+  function setCard(item, key, value) {
+    const record = recordOf(item);
+    record.card = { ...record.card, [key]: value };
+    if (!value) delete record.card[key];
+    drawItem(item);
+    drawSummary(item.host);
+    persist();
+  }
+
+  function cardRow(list, label, control) {
+    const detail = el('dd');
+    detail.append(control);
+    list.append(el('dt', '', label), detail);
+  }
+
+  function cardInput(item, key, label) {
+    const input = el('input');
+    input.value = cardValue(item, key);
+    input.placeholder = label;
+    input.setAttribute('aria-label', label);
+    input.addEventListener('change', () => setCard(item, key, input.value.trim()));
+    return input;
+  }
+
+  function cardSelect(item, key, label, emptyLabel, options) {
+    const select = el('select');
+    select.setAttribute('aria-label', label);
+    select.add(new Option(emptyLabel, ''));
+    for (const option of options) select.add(new Option(option.label, option.id));
+    select.value = cardValue(item, key);
+    select.addEventListener('change', () => setCard(item, key, select.value));
+    return select;
+  }
+
+  function statusControl(item) {
+    if (!item.def.status) return cardSelect(item, 'status', contract.statusLabel, '—', statuses.values());
+    const known = statuses.get(item.def.status);
+    return el('b', known ? `tone-${known.tone}` : '', known ? known.label : item.def.status);
+  }
+
+  function classControl(item) {
+    if (!item.def.class) return cardSelect(item, 'class', LABELS.fieldClass, LABELS.unclassified, classes.values());
+    return classes.has(item.def.class) ? pill(classes.get(item.def.class)) : el('span', 'pill', item.def.class);
+  }
+
+  // Empty cells of the passport are inputs: a bare JSON gets filled in here.
+  function textOrInput(item, key, label, className) {
+    const box = el('div', className);
+    box.append(item.def[key] || cardInput(item, key, label));
+    return box;
+  }
+
+  function drawCard(item) {
+    const title = el('h3', '', item.path);
+    const eyebrow = el('div', 'eyebrow', `${LABELS.passport} · ${LABELS.registry} ${item.number}`);
+    const badge = el('div');
+    badge.style.margin = '0 0 12px';
+    if (classes.size) badge.append(classControl(item));
+    const list = el('dl', 'kv');
+    cardRow(list, LABELS.type, item.type);
+    cardRow(list, LABELS.example, JSON.stringify(item.example).slice(0, 120));
+    if (statuses.size) cardRow(list, contract.statusLabel, statusControl(item));
+    for (const { key, label } of contract.attributes) {
+      cardRow(list, label, item.def[key] || cardInput(item, key, label));
+    }
+    item.host.card.replaceChildren(
+      eyebrow,
+      title,
+      textOrInput(item, 'title', LABELS.fieldTitle, 'biz'),
+      badge,
+      list,
+      textOrInput(item, 'note', LABELS.fieldNote, 'note'),
+      item.review,
+    );
+  }
+
+  function selectField(item) {
+    const previous = item.host.current;
+    if (previous) previous.line.classList.remove('sel');
+    item.host.current = item;
+    item.line.classList.add('sel');
+    drawItem(item);
+  }
+
+  function jsonLine(parent, depth, text) {
+    const line = el('div', 'ln', '  '.repeat(depth));
+    if (text) line.append(el('span', 'p', text));
+    parent.append(line);
+    return line;
+  }
+
+  function valueSpan(value) {
+    if (value === null) return el('span', 'nul', 'null');
+    return el('span', typeof value === 'string' ? 's' : 'num', JSON.stringify(value));
+  }
+
+  function renderJson(parent, fields, value, path, key, depth, comma) {
+    const line = jsonLine(parent, depth);
+    let item = null;
+    if (key !== null) {
+      const button = el('button', 'key', `"${key}"`);
+      button.type = 'button';
+      button.dataset.path = path;
+      // Array elements repeat a path; only the first key carries the marks.
+      const field = fields.get(path);
+      if (!field.button) {
+        item = field;
+        item.button = button;
+        item.line = line;
+        item.dot = el('span', 'miss');
+      }
+      line.append(button, el('span', 'p', ': '));
+    }
+    if (value === null || typeof value !== 'object') {
+      line.append(valueSpan(value), el('span', 'p', comma));
+      if (item) line.append(item.dot);
+      return;
+    }
+    const isArray = Array.isArray(value);
+    const entries = Object.entries(value);
+    const shown = isArray ? entries.slice(0, ARRAY_PREVIEW) : entries;
+    line.append(el('span', 'p', isArray ? '[' : '{'));
+    if (item) line.append(item.dot);
+    shown.forEach(([k, child], i) => {
+      const next = i < entries.length - 1 ? ',' : '';
+      if (isArray) renderJson(parent, fields, child, `${path}[]`, null, depth + 1, next);
+      else renderJson(parent, fields, child, childPath(path, k), k, depth + 1, next);
+    });
+    if (shown.length < entries.length) jsonLine(parent, depth + 1, `… ${entries.length - shown.length} ${LABELS.more}`);
+    jsonLine(parent, depth, `${isArray ? ']' : '}'}${comma}`);
+  }
+
+  function legend() {
+    const row = el('div', 'legend');
+    const groups = contract.groups.length ? contract.groups : [{ id: undefined, label: '' }];
+    for (const group of groups) {
+      const box = el('div', 'grp');
+      if (group.label) box.append(el('b', '', group.label));
+      for (const c of classes.values()) if (c.group === group.id) box.append(pill(c));
+      if (box.querySelector('.pill')) row.append(box);
+    }
+    if (statuses.size) {
+      const box = el('div', 'grp');
+      box.append(el('b', '', contract.statusLabel));
+      for (const s of statuses.values()) box.append(el('span', `tone-${s.tone}`, `● ${s.label}`));
+      row.append(box);
+    }
+    return row;
+  }
+
+  function copyButton(document_) {
+    const button = el('button', 'cbtn sm', LABELS.copy);
+    button.type = 'button';
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(document_, null, 2));
+        button.textContent = LABELS.copied;
+      } catch (error) {
+        button.textContent = LABELS.copyFailed;
+      }
+      setTimeout(() => { button.textContent = LABELS.copy; }, 1500);
+    });
+    return button;
+  }
+
+  function buildJsonBlocks() {
+    return [...document.querySelectorAll('[data-json]')].map((block) => {
+      const document_ = contract.documents[block.dataset.json];
+      const host = { card: el('aside', 'panel detail'), current: null, summary: el('div', 'sumbar') };
+      host.fields = fieldItems(host, block.dataset.json);
+      const code = el('div', 'json');
+      renderJson(code, host.fields, document_, '', null, 0, '');
+      code.addEventListener('click', (event) => {
+        const key = event.target.closest('.key');
+        if (key) selectField(host.fields.get(key.dataset.path));
+      });
+      const head = el('div', 'phead');
+      head.append(copyButton(document_));
+      const panel = el('div', 'panel');
+      panel.append(host.summary, head, code);
+      const grid = el('div', 'two');
+      grid.append(panel, host.card);
+      block.append(legend(), grid);
+      return { host, first: host.fields.values().next().value };
+    });
+  }
+
+  function stateOf(item) {
+    const record = data.items[item.id];
+    if (!record) return 'new';
+    if (record.snapshot !== item.hash) return 'changed';
+    return record.approved && record.approved.hash === item.hash ? 'approved' : 'open';
+  }
+
+  function recordOf(item) {
+    if (!data.items[item.id]) data.items[item.id] = { snapshot: item.hash, approved: null, comments: [], card: {} };
+    return data.items[item.id];
+  }
+
+  // Sorted keys and fixed indentation keep the file's git diffs small.
+  function serialize() {
+    const sorted = {};
+    for (const id of Object.keys(data.items).sort()) sorted[id] = data.items[id];
+    return `${JSON.stringify({ ...data, items: sorted }, null, 2)}\n`;
+  }
+
+  const pending = new Map();
+  window.addEventListener('message', (event) => {
+    const reply = event.data;
+    if (!reply || reply.channel !== CHANNEL || !reply.reply) return;
+    const settle = pending.get(reply.reqId);
+    if (settle) settle(reply);
+  });
+
+  function ask(op, extra = {}, timeout = 3000) {
+    if (window.parent === window) return Promise.resolve(null);
+    const reqId = `${Date.now()}-${Math.random()}`;
+    return new Promise((resolve) => {
+      const settle = (reply) => { pending.delete(reqId); resolve(reply); };
+      pending.set(reqId, settle);
+      window.parent.postMessage({ channel: CHANNEL, op, reqId, file: DB, ...extra }, '*');
+      setTimeout(() => settle(null), timeout);
+    });
+  }
+
+  const say = (text) => { $('status').textContent = text; };
+
+  async function persist() {
+    data.updated_at = new Date().toISOString();
+    if (bridged) await writeFile();
+    else say(LABELS.pressSave);
+  }
+
+  async function writeFile() {
+    const reply = await ask('write', { content: serialize() });
+    say(reply && reply.ok ? `${LABELS.saved} ${DB}` : `${LABELS.notSaved} ${(reply && reply.error) || LABELS.noAnswer}`);
+  }
+
+  async function save() {
+    if (bridged) await writeFile();
+    else download();
+  }
+
+  function download() {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([serialize()], { type: 'application/json' }));
+    link.download = DB;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    say(`${LABELS.downloaded} ${DB}`);
+  }
+
+  async function loadChosenFile() {
+    const [file] = $('load-file').files;
+    $('load-file').value = '';
+    if (!file) return;
+    try {
+      accept(await file.text(), file.name);
+    } catch (error) {
+      say(`${LABELS.notLoaded} ${error.message}`);
+      return;
+    }
+    refreshAll();
+    if (bridged) await writeFile();
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    $('theme').textContent = theme === 'dark' ? LABELS.day : LABELS.night;
+  }
+
+  const currentTheme = () => document.documentElement.dataset.theme
+    || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  function toggleTheme() {
+    const theme = currentTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(theme);
+    ask('theme', { theme });
+  }
+
+  function button(parent, text, onClick) {
+    const node = el('button', 'cbtn sm', text);
+    node.type = 'button';
+    node.addEventListener('click', onClick);
+    parent.append(node);
+  }
+
+  function drawStat() {
+    const records = Object.values(data.items);
+    const approved = items.filter((item) => stateOf(item) === 'approved').length;
+    const comments = records.reduce((sum, record) => sum + record.comments.length, 0);
+    $('stat').textContent = `✓ ${approved} ${LABELS.approvedCount} · ✎ ${comments} ${LABELS.commentCount}`;
+  }
+
+  // Only the selected field has its review drawn; the rest show just a mark.
+  function refreshItem(item) {
+    if (item.host && item.host.current !== item) markField(item);
+    else drawItem(item);
+  }
+
+  function drawItem(item) {
+    item.review.replaceChildren();
+    const state = stateOf(item);
+    const record = data.items[item.id];
+    const heading = el('h4', '', LABELS.review);
+    heading.append(el('span', `badge ${state}`, LABELS.states[state]));
+    item.review.append(heading);
+    for (const comment of (record && record.comments) || []) {
+      const row = el('div', 'citem comment');
+      row.append(el('small', '', `${comment.author || LABELS.anonymous}, ${comment.at.slice(0, 10)}`), comment.text);
+      item.review.append(row);
+    }
+    const controls = el('div', 'controls');
+    const input = el('input');
+    input.placeholder = LABELS.comment;
+    input.setAttribute('aria-label', `${LABELS.comment}: ${item.id}`);
+    controls.append(input);
+    const change = (apply) => { apply(); drawItem(item); drawStat(); persist(); };
+    button(controls, LABELS.comment, () => {
+      const text = input.value.trim();
+      if (!text) return;
+      change(() => recordOf(item).comments.push({ author: $('author').value.trim(), at: new Date().toISOString(), text }));
+    });
+    if (state === 'changed') {
+      button(controls, LABELS.acceptChange, () => change(() => {
+        const current = recordOf(item);
+        current.snapshot = item.hash;
+        current.approved = null;
+      }));
+    } else if (state !== 'approved') {
+      button(controls, LABELS.approve, () => change(() => {
+        recordOf(item).approved = { by: $('author').value.trim(), at: new Date().toISOString(), hash: item.hash };
+      }));
+    }
+    item.review.append(controls);
+    if (item.button) markField(item);
+    if (item.host && item.host.current === item) drawCard(item);
+  }
+
+  function refreshAll() {
+    items.forEach(refreshItem);
+    jsonBlocks.forEach(({ host }) => drawSummary(host));
+    drawStat();
+  }
+
+  function buildTabs() {
+    const sections = [...document.querySelectorAll('[data-tab]')];
+    const tabs = sections.map((section) => {
+      const tab = el('button', '', section.dataset.tab);
+      tab.setAttribute('role', 'tab');
+      tab.addEventListener('click', () => select(section));
+      $('tabs').append(tab);
+      return tab;
+    });
+    function select(chosen) {
+      sections.forEach((section, i) => {
+        section.hidden = section !== chosen;
+        tabs[i].setAttribute('aria-selected', String(section === chosen));
+      });
+    }
+    select(sections[0]);
+  }
+
+  function accept(text, from) {
+    const loaded = JSON.parse(text);
+    if (loaded.format !== FORMAT) throw new Error(`format is ${loaded.format}`);
+    data = { ...data, ...loaded, document: DOC };
+    say(`${LABELS.loadedFrom} ${from}`);
+  }
+
+  async function load() {
+    const pong = await ask('ping', {}, 800);
+    bridged = !!(pong && pong.ok);
+    applyTheme((pong && pong.theme) || currentTheme());
+    if (bridged) {
+      const reply = await ask('read');
+      if (reply && reply.ok && reply.content) accept(reply.content, DB);
+      else say(reply && reply.ok ? `${LABELS.noFile} ${DB}` : `${LABELS.notLoaded} ${(reply && reply.error) || LABELS.noAnswer}`);
+      return;
+    }
+    const response = await fetch(DB, { cache: 'no-store' }).catch(() => null);
+    if (response && response.ok) accept(await response.text(), `${DB}, ${LABELS.readOnly}`);
+    else say(LABELS.pressSave);
+  }
+
+  $('discussion').textContent = LABELS.discussion;
+  $('db').textContent = DB;
+  $('author-label').textContent = LABELS.author;
+  $('load').textContent = LABELS.load;
+  $('save').textContent = LABELS.save;
+  $('load').addEventListener('click', () => $('load-file').click());
+  $('load-file').addEventListener('change', loadChosenFile);
+  $('save').addEventListener('click', save);
+  $('theme').addEventListener('click', toggleTheme);
+  applyTheme(currentTheme());
+  const jsonBlocks = buildJsonBlocks();
+  buildTabs();
+  load()
+    .catch((error) => say(`${LABELS.notLoaded} ${error.message}`))
+    .finally(() => {
+      refreshAll();
+      for (const { host, first } of jsonBlocks) {
+        if (first && !host.current) selectField(first);
+      }
+    });
+})();
+</script>
+</body>
+</html>
